@@ -1,0 +1,53 @@
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.bak
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.code-workspace
+
+# Testing and coverage
+.coverage
+.tox/
+.nox/
+.cache/
+pytest_cache/
+
+# Packaging
+dist/
+build/
+*.egg-info/
+
+# Environment variables and secrets
+.env
+*.env
+
+# Django specific
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+local_settings.py
+
+# Migrations (optional to ignore __pycache__ only)
+**/migrations/__pycache__/
+# If you prefer to exclude all migration files (not always recommended):
+# **/migrations/
