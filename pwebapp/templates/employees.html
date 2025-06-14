@@ -1,0 +1,83 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Funcionários</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="header">
+      <i class="header-icon fas fa-bars"></i>
+      <h1 class="store-name">Nome do estabelecimento</h1>
+      <i class="header-icon fas fa-user"></i>
+    </header>
+
+    <main class="main-content">
+      <div class="section-header">
+        <h2 class="section-title">Funcionários</h2>
+        <div class="actions-section">
+          <form action="">
+            <div class="search">
+              <i class="fas fa-search"></i>
+              <input
+                type="text"
+                name="q"
+                placeholder="Buscar..."
+                value="{{ query }}"
+              />
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <section class="order-list">
+        <table>
+          <thead>
+            <tr>
+              <th>Login</th>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>Permissões</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+              <tr>
+                <td>
+                  {{ user.username }}
+                </td>
+                <td>
+                  {{ user.get_full_name|default:"-" }}
+                </td>
+                <td>
+                  {{ user.email|default:"-" }}
+                </td>
+                <td>
+                  {% if user.is_superuser %}
+                    Administrador
+                  {% elif user.is_staff %}
+                    Gerente
+                  {% else %}
+                    Comum
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="4">Nenhum atendente encontrado.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>
