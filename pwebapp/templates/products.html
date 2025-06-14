@@ -1,0 +1,180 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Produtos</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="header">
+      <i class="header-icon fas fa-bars"></i>
+      <h1 class="store-name">Nome do estabelecimento</h1>
+      <i class="header-icon fas fa-user"></i>
+    </header>
+
+    <main class="main-content">
+      <div class="section-header">
+        <h2 class="section-title">Produtos</h2>
+        <div class="actions-section">
+          <button
+            class="btn btn-add"
+            onclick="openAddOrEditModal('add', 'produto')"
+          >
+            <i class="fas fa-plus"></i> Adicionar
+          </button>
+
+          <form class="search" method="get">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              name="q"
+              placeholder="Buscar..."
+              value="{{ query }}"
+            />
+          </form>
+        </div>
+      </div>
+
+      <section class="order-list">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Descrição</th>
+              <th>Preço</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in products %}
+              <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ product.description|default:"-" }}</td>
+                <td>R${{ product.price|floatformat:2 }}</td>
+                <td class="actions-cell">
+                  <button
+                    class="btn-action btn-edit"
+                    title="Editar"
+                    onclick="openAddOrEditModal('edit', 'produto', this)"
+                    data-id="{{ product.id }}"
+                    data-name="{{ product.name }}"
+                    data-price="{{ product.price }}"
+                    data-description="{{ product.description|default:'' }}"
+                  >
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                  <button
+                    class="btn-action btn-delete"
+                    title="Remover"
+                    onclick="openDeleteModal('{{ product.id }}')"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="4">Nenhum produto encontrado.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <div id="add-edit-modal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button
+            class="modal-btn-back"
+            title="Voltar"
+            onclick="closeAddOrEditModal()"
+          >
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h2 id="modal-title" class="modal-title">Adicionar produto</h2>
+        </div>
+        <form id="add-edit-form" method="POST" novalidate>
+          {% csrf_token %}
+          <div class="fields-container">
+            <div class="field">
+              <label for="name" class="field-label">Nome</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                class="text-field"
+                placeholder="Nome do produto"
+                required
+              />
+              <span id="name-error" class="error hidden">O nome é obrigatório</span>
+            </div>
+            <div class="field">
+              <label for="price" class="field-label">Valor</label>
+              <input
+                type="number"
+                id="price"
+                name="price"
+                step="0.01"
+                class="number-field"
+                placeholder="0,00"
+                required
+              />
+              <span id="price-error" class="error hidden">O preço deve ser um número válido</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="description" class="field-label">Descrição</label>
+            <input
+              type="text"
+              id="description"
+              name="description"
+              class="text-field"
+              placeholder="Descrição do produto"
+            />
+          </div>
+          <div class="form-actions">
+            <button id="submit-button" type="submit" class="btn btn-add"></button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="delete-modal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">Deseja deletar o produto?</h2>
+        </div>
+        <div class="modal-actions">
+          <button
+            class="btn btn-cancel"
+            title="Cancelar"
+            onclick="closeDeleteModal()"
+          >
+            Cancelar
+          </button>
+          <form id="delete-form" method="POST">
+            {% csrf_token %}
+            <button
+              class="btn btn-confirm"
+              title="Confirmar"
+              type="submit"
+            >
+              Confirmar
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="{% static 'js/script.js' %}" defer></script>
+  </body>
+</html>
