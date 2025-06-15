@@ -37,7 +37,7 @@ function openAddOrEditModal(type, edit_button = null) {
             e.preventDefault();
         }
 
-        if (!priceInput.value.trim() || isNaN(priceInput.value)) {
+        if (!priceInput.value.trim() || isNaN(priceInput.value) || parseFloat(priceInput.value) < 0) {
             priceError.classList.remove('hidden');
             e.preventDefault();
         }
