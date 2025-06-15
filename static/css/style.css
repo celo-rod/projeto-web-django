@@ -105,17 +105,17 @@ body {
     font-size: 16px;
 }
 
-.order-list {
+.main-list {
     width: 100%;
 }
 
-.order-list table {
+.main-list table {
     width: 100%;
     table-layout: auto;
     border-collapse: collapse;
 }
 
-.order-list th {
+.main-list th {
     padding: 0.8rem 1.2rem;
     color: #555;
     font-size: 16px;
@@ -124,11 +124,11 @@ body {
     background-color: #e0e0e0;
 }
 
-.order-list tbody tr {
+.main-list tbody tr {
     background-color: #f9f9f9;
 }
 
-.order-list td {
+.main-list td {
     padding: 0.8rem 1.2rem;
     font-size: 16px;
     color: #444;
@@ -215,10 +215,6 @@ body {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
-}
-
-.grupo-campo {
-    margin-bottom: 20px;
 }
 
 .fields-container {
