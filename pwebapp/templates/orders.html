@@ -1,0 +1,156 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Comandas</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="header">
+      <i class="header-icon fas fa-bars"></i>
+      <h1 class="store-name">Nome do estabelecimento</h1>
+      <i class="header-icon fas fa-user"></i>
+    </header>
+
+    <main class="main-content">
+      <div class="section-header">
+        <h2 class="section-title">Comandas</h2>
+        <div class="actions-section">
+          <button
+            class="btn btn-add"
+            onclick="openAddOrEditModal('add')"
+          >
+            <i class="fas fa-plus"></i> Abrir comanda
+          </button>
+
+          <form class="search" method="get">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              name="q"
+              placeholder="Buscar..."
+              value="{{ query }}"
+            />
+          </form>
+        </div>
+      </div>
+
+      <section class="main-list">
+        <table>
+          <thead>
+            <tr>
+              <th>Mesa</th>
+              <th>Responsável</th>
+              <th>Situação</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in orders %}
+              <tr>
+                <td>{{ order.table_number }}</td>
+                <td>{{ order.responsible_name }}</td>
+                <td>
+                  {% if order.is_paid %}
+                    <i class="fas fa-circle" style="color: red; margin-right: 0.5rem;"></i>Fechada
+                  {% else %}
+                    <i class="fas fa-circle" style="color: green; margin-right: 0.5rem;"></i>Aberta
+                  {% endif %}
+                </td>
+                <td class="actions-cell">
+                  <button
+                    class="btn-action btn-edit"
+                    title="Editar"
+                    onclick="openAddOrEditModal('edit', this)"
+                  >
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                  <button
+                    class="btn-action btn-view"
+                    title="Ver"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="4">Nenhuma comanda encontrada.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <div id="add-edit-modal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button
+            class="modal-btn-back"
+            title="Voltar"
+            onclick="closeAddOrEditModal()"
+          >
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h2 id="modal-title" class="modal-title"></h2>
+        </div>
+        <form id="add-edit-form" method="POST" novalidate>
+          {% csrf_token %}
+          <div class="fields-container">
+            <div class="field">
+              <label for="table_number" class="field-label">Mesa</label>
+              <input
+                type="number"
+                id="table_number"
+                name="table_number"
+                class="number-field"
+                placeholder="00"
+                required
+              />
+              <span id="table-number-error" class="error hidden">O número da mesa deve ser um número válido</span>
+            </div>
+            <div class="field">
+              <label for="responsible_name" class="field-label">Cliente</label>
+              <input
+                type="text"
+                id="responsible_name"
+                name="responsible_name"
+                class="text-field"
+                placeholder="Nome do cliente"
+                required
+              />
+              <span id="responsible-name-error" class="error hidden">O nome do cliente é obrigatório</span>
+            </div>
+          </div>
+          <div class="order-items-section">
+            <label class="field-label">Items</label>
+            <div id="order-items-container" class="hidden"></div>
+            <span id="items-error" class="error hidden">Pelo menos um item válido é necessário para abrir a comanda</span>
+            <button
+              type="button"
+              class="btn btn-add-item"
+              onclick="addOrderItem()"
+            >
+              + Adicionar
+            </button>
+          </div>
+          <div class="form-actions">
+            <button id="submit-button" type="submit" class="btn btn-add"></button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {{ products_data|json_script:"product-data" }}
+    <script src="{% static 'js/order.js' %}" defer></script>
+  </body>
+</html>
