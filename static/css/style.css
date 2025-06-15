@@ -278,6 +278,44 @@ body {
   font-size: 0.9rem;
 }
 
+.order-items-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+#order-items-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.order-item {
+  display: grid;
+  grid-template-columns: 1fr 80px 20px;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.order-item select,
+.order-item input[type="number"] {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.btn-add-item {
+    background-color: #3b40d8;
+    color: white;
+}
+
+.btn-add-item:hover {
+    background-color: #2e38b8;
+}
+
 .hidden {
-    display: none;
+    display: none !important;
+    visibility: hidden;
 }
