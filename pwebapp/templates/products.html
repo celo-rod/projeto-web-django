@@ -15,10 +15,27 @@
   </head>
   <body>
     <header class="header">
-      <i class="header-icon fas fa-bars"></i>
+      {% if request.user.is_staff or request.user.is_superuser %}
+        <i class="header-icon fas fa-bars"></i>
+      {% endif %}
       <h1 class="store-name">Nome do estabelecimento</h1>
       <i class="header-icon fas fa-user"></i>
     </header>
+    {% if request.user.is_staff or request.user.is_superuser %}
+      <nav id="dropdown-menu" class="dropdown hidden">
+        <ul>
+          <li><a href="./orders">Comandas</a></li>
+          <li><a href="./products">Produtos</a></li>
+          <li><a href="./employees">Atendentes</a></li>
+        </ul>
+      </nav>
+    {% endif %}
+    <div id="user-dropdown" class="dropdown hidden">
+      <ul>
+      <li>{{ request.user.username }}</li>
+      <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt" style="margin-right: 0.5rem;"></i>Sair</a></li>
+      </ul>
+    </div>
 
     <main class="main-content">
       <div class="section-header">
@@ -176,5 +193,6 @@
     </div>
 
     <script src="{% static 'js/product.js' %}" defer></script>
+    <script src="{% static 'js/script.js' %}" defer></script>
   </body>
 </html>
