@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Comandas</title>
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon" />
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
     <link
       rel="stylesheet"
@@ -15,10 +16,27 @@
   </head>
   <body>
     <header class="header">
-      <i class="header-icon fas fa-bars"></i>
+      {% if request.user.is_staff or request.user.is_superuser %}
+        <i class="header-icon fas fa-bars"></i>
+      {% endif %}
       <h1 class="store-name">Nome do estabelecimento</h1>
       <i class="header-icon fas fa-user"></i>
     </header>
+    {% if request.user.is_staff or request.user.is_superuser %}
+      <nav id="dropdown-menu" class="dropdown hidden">
+        <ul>
+          <li><a href="./orders">Comandas</a></li>
+          <li><a href="./products">Produtos</a></li>
+          <li><a href="./employees">Atendentes</a></li>
+        </ul>
+      </nav>
+    {% endif %}
+    <div id="user-dropdown" class="dropdown hidden">
+      <ul>
+      <li>{{ request.user.username }}</li>
+      <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt" style="margin-right: 0.5rem;"></i>Sair</a></li>
+      </ul>
+    </div>
 
     <main class="main-content">
       <div class="section-header">
@@ -69,13 +87,14 @@
                   <button
                     class="btn-action btn-edit"
                     title="Editar"
-                    onclick="openAddOrEditModal('edit', this)"
+                    onclick="openAddOrEditModal('edit', '{{ order.id }}')"
                   >
                     <i class="fas fa-pencil-alt"></i>
                   </button>
                   <button
                     class="btn-action btn-view"
                     title="Ver"
+                    onclick="openViewOrderModal('{{ order.id }}')"
                   >
                     <i class="fas fa-eye"></i>
                   </button>
@@ -134,7 +153,7 @@
           <div class="order-items-section">
             <label class="field-label">Items</label>
             <div id="order-items-container" class="hidden"></div>
-            <span id="items-error" class="error hidden">Pelo menos um item válido é necessário para abrir a comanda</span>
+            <span id="items-error" class="error hidden">Pelo menos um item válido é necessário</span>
             <button
               type="button"
               class="btn btn-add-item"
@@ -150,7 +169,60 @@
       </div>
     </div>
 
+  <div id="view-order-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="modal-btn-back" onclick="closeViewOrderModal()" title="Fechar">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <h2 class="modal-title">
+          Visualizar comanda
+          <i id="order-status-icon" class="fas fa-circle" style="margin-left: 0.5rem;"></i>
+        </h2>
+      </div>
+
+      <div class="fields-container">
+        <div class="fields">
+          <span class="field-label">Mesa</span>
+          <p id="view-table-number" class="text-field" readonly></p>
+        </div>
+        <div class="fields">
+          <span class="field-label">Responsável</span>
+          <p id="view-responsible-name" class="text-field" readonly></p>
+        </div>
+      </div>
+
+      <div class="fields-container">
+        <div class="fields">
+          <span class="field-label">Aberta em</span>
+          <p id="view-opened-at" class="text-field" readonly></p>
+        </div>
+        <div class="fields">
+          <span class="field-label">Fechada em</span>
+          <p id="view-closed-at" class="text-field" readonly></p>
+        </div>
+      </div>
+
+      <div class="order-items-section">
+        <span class="field-label">Itens</span>
+        <ul id="view-order-items" class="main-list"></ul>
+      </div>
+
+      <div class="fields-container">
+        <div class="fields">
+          <span class="field-label">Total</span>
+          <p id="view-total-price" class="text-field" readonly></p>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button id="btn-close-order" class="btn btn-confirm" onclick="closeOrder()">Fechar comanda</button>
+      </div>
+    </div>
+  </div>
+
     {{ products_data|json_script:"product-data" }}
     <script src="{% static 'js/order.js' %}" defer></script>
+    <script src="{% static 'js/script.js' %}" defer></script>
   </body>
 </html>
