@@ -1,0 +1,30 @@
+---
+const { user } = Astro.props;
+---
+
+<header class="header">
+  {(user?.is_staff || user?.is_superuser) && (
+    <i class="header-icon fas fa-bars"></i>
+  )}
+  <h1 class="store-name">Nome do estabelecimento</h1>
+  <i class="header-icon fas fa-user"></i>
+</header>
+{(user?.is_staff || user?.is_superuser) && (
+  <nav id="dropdown-menu" class="dropdown hidden">
+    <ul>
+      <li><a href="./orders">Comandas</a></li>
+      <li><a href="./products">Produtos</a></li>
+      <li><a href="./employees">Funcionários</a></li>
+    </ul>
+  </nav>
+)}
+<div id="user-dropdown" class="dropdown hidden">
+  <ul>
+    <li>{user?.username}</li>
+    <li><a id="logout-button" href="#"><i class="fas fa-sign-out-alt" style="margin-right: 0.5rem;"></i>Sair</a></li>
+  </ul>
+</div>
+
+<script>
+  import "../scripts/logout.js";
+</script>
