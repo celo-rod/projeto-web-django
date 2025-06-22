@@ -1,0 +1,57 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import type { Product } from "../types/product";
+
+const pageTitle = "Produtos"; 
+
+const token = Astro.cookies.get("token")?.value;
+
+const response = await fetch("http://localhost:8000/api/products/", {
+  method: "GET",
+  headers: {
+    Authorization: `Token ${token}`,
+  },
+});
+
+const products: Product[] = await response.json();
+---
+
+<BaseLayout pageTitle={pageTitle} shouldDisplayActionBtn={true} actionText="Adicionar">
+  <table>
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Descrição</th>
+        <th>Preço</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {products.length === 0 ? (
+        <tr><td colspan="4">Nenhum produto encontrado.</td></tr>
+      ) : (
+        products.map(product => (
+          <tr>
+            <td>{product.name}</td>
+            <td>{product.description || "-"}</td>
+            <td>{product.price}</td>
+            <td class="actions-cell">
+              <button
+                class="btn-action btn-edit"
+                title="Editar"
+              >
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+              <button
+                class="btn-action btn-delete"
+                title="Remover"
+              >
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr> 
+        ))
+      )}
+    </tbody>
+  </table>
+</BaseLayout>

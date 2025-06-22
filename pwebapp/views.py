@@ -1,13 +1,18 @@
 from django.contrib.auth.models import User
 from .models import Product, Order, OrderItem
+from .serializers import UserSerializer, ProductSerializer, OrderSerializer
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.timezone import localtime
 from django.db.models import Q
-from django.http import HttpResponseBadRequest, JsonResponse
+from django.http import HttpResponseBadRequest, JsonResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 
 @login_required
 @staff_member_required
@@ -224,3 +229,69 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+# API
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def api_logout(request):
+    request.user.auth_token.delete()
+    return Response({"success": True}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_current_user(request):
+    user = request.user
+    return Response({
+        'username': user.username,
+        'is_staff': user.is_staff,
+        'is_superuser': user.is_superuser,
+    }, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_employees(request):
+    query = request.GET.get('q', '')
+    users = User.objects.all()
+
+    if query:
+        users = users.filter(
+            Q(username__icontains=query) |
+            Q(email__icontains=query)
+        )
+
+    users = users.order_by('username')
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_products(request):
+    query = request.GET.get('q', '')
+    products = Product.objects.all()
+
+    if query:
+        products = products.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query)
+        )
+
+    products = products.order_by('name')
+    serializer = ProductSerializer(products, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_orders(request):
+    query = request.GET.get('q', '')
+    orders = Order.objects.all()
+
+    if query:
+        orders = orders.filter(
+            Q(table_number__icontains=query) |
+            Q(responsible_name__icontains=query)
+        )
+
+    orders = orders.order_by('is_paid', 'opened_at')
+    serializer = OrderSerializer(orders, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)

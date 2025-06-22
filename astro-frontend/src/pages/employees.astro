@@ -1,0 +1,47 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import type { Employee } from "../types/employee";
+
+const pageTitle = "Funcionários";
+
+const token = Astro.cookies.get("token")?.value;
+const response = await fetch("http://localhost:8000/api/employees/", {
+  method: "GET",
+  headers: {
+    Authorization: `Token ${token}`,
+  },
+});
+const employees: Employee[] = await response.json();
+---
+
+<BaseLayout pageTitle={pageTitle}>
+  <table>
+    <thead>
+      <tr>
+        <th>Login</th>
+        <th>Nome</th>
+        <th>E-mail</th>
+        <th>Permissões</th>
+      </tr>
+    </thead>
+    <tbody>
+      {employees.length === 0 ? (
+        <tr><td colspan="4">Nenhum funcionário encontrado.</td></tr>
+      ) : (
+        employees.map(employee => (
+          <tr>
+            <td>{employee.username}</td>
+            <td>{employee.full_name || "-"}</td>
+            <td>{employee.email || "-"}</td>
+            <td>{employee.is_superuser
+                ? "Administrador"
+                : employee.is_staff
+                ? "Gerente"
+                : "Comum"}
+            </td>
+          </tr>
+        ))
+      )}
+    </tbody>
+  </table>
+</BaseLayout>

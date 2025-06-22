@@ -1,0 +1,42 @@
+---
+import "../styles/login.css";
+const pageTitle = "Login";
+const appName = "Gerenciador de Comandas";
+
+const token = Astro.cookies.get("token")?.value;
+
+if (token) {
+  return Astro.redirect("/");
+}
+---
+
+<html lang="pt-BR">
+  <head>
+      <meta charset="UTF-8">
+      <title>{pageTitle }</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-sidebar">
+        <h1 class="login-title ">{appName}</h1>
+      </div>
+      <form id="login-form" class="login-form">
+        <h2>{pageTitle}</h2>
+        <div class="input-group">
+          <i class="fas fa-user"></i>
+          <input type="text" placeholder="Usuário" name="username" required>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" placeholder="Senha" name="password" required>
+        </div>
+        <button type="submit" class="login-button">Entrar</button>
+        </div>
+      </form>
+
+      <script>
+        import "../scripts/login.js";
+      </script>
+  </body>
+</html>
