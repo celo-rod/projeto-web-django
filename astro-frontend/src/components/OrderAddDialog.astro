@@ -1,0 +1,51 @@
+---
+import AddDialogLayout from "../layouts/AddDialogLayout.astro";
+---
+
+<AddDialogLayout title="Nova comanda">
+  <form id="add-form" novalidate>
+    <div class="fields-container">
+      <div class="field">
+        <label for="table_number" class="field-label">Mesa</label>
+        <input
+          type="number"
+          id="table_number"
+          name="table_number"
+          class="number-field"
+          placeholder="00"
+          required
+        />
+        <span id="table-number-error" class="error hidden"
+          >O número da mesa deve ser um número válido</span
+        >
+      </div>
+      <div class="field">
+        <label for="responsible_name" class="field-label">Cliente</label>
+        <input
+          type="text"
+          id="responsible_name"
+          name="responsible_name"
+          class="text-field"
+          placeholder="Nome do cliente"
+          required
+        />
+        <span id="responsible-name-error" class="error hidden"
+          >O nome do cliente é obrigatório</span
+        >
+      </div>
+    </div>
+    <div class="order-items-section">
+      <label class="field-label">Items</label>
+      <div id="order-items-container" class="hidden"></div>
+      <span id="items-error" class="error hidden"
+        >Pelo menos um item válido é necessário</span
+      >
+      <button id="btn-add-item" type="button" class="btn btn-add-item">
+        + Adicionar
+      </button>
+    </div>
+    <div class="form-actions">
+      <button id="submit-button" type="submit" class="btn btn-add">Abrir</button>
+    </div>
+  </form>
+</AddDialogLayout>

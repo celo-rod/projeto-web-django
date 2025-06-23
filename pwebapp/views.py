@@ -288,7 +288,7 @@ def api_create_product(request):
     price = request.data.get('price')
 
     if not name or not price:
-        return Response({"error": "Name and price are required fields."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "Name and price are required fields."}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         product = Product.objects.create(
@@ -299,7 +299,7 @@ def api_create_product(request):
         serializer = ProductSerializer(product)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -310,7 +310,7 @@ def api_update_product(request, pk):
     price = request.data.get('price', product.price)
 
     if not name or not price:
-        return Response({"error": "Name and price are required fields."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "Name and price are required fields."}, status=status.HTTP_400_BAD_REQUEST)
 
     product.name = name
     product.description = description
@@ -321,7 +321,7 @@ def api_update_product(request, pk):
         serializer = ProductSerializer(product)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
@@ -332,7 +332,7 @@ def api_delete_product(request, pk):
         product.delete()
         return Response({"success": True}, status=status.HTTP_204_NO_CONTENT)
     except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -349,3 +349,125 @@ def api_orders(request):
     orders = orders.order_by('is_paid', 'opened_at')
     serializer = OrderSerializer(orders, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def api_create_order(request):
+    table_number = request.data.get('table_number')
+    responsible_name = request.data.get('responsible_name')
+    products = request.data.get('products', [])
+    quantities = request.data.get('quantities', [])
+
+    if not table_number or not responsible_name:
+        return Response({"detail": "Table number and responsible name are required fields."}, status=status.HTTP_400_BAD_REQUEST)
+
+    valid_items = []
+    for product_id, quantity in zip(products, quantities):
+        try:
+            quantity = int(quantity)
+            if not product_id or quantity <= 0:
+                continue
+            
+            product = Product.objects.get(id=product_id)
+            valid_items.append({
+                'product': product,
+                'quantity': quantity
+            })
+        except (Product.DoesNotExist, ValueError):
+            continue
+
+    if not valid_items:
+        return Response({"detail": "At least one valid product with a quantity greater than 0 is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    order = Order.objects.create(
+        table_number=table_number,
+        responsible_name=responsible_name
+    )
+
+    for item in valid_items:
+        OrderItem.objects.create(
+            order=order,
+            product=item['product'],
+            quantity=item['quantity']
+        )
+
+    serializer = OrderSerializer(order)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def api_update_order(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    order.table_number = request.data.get('table_number', order.table_number)
+    order.responsible_name = request.data.get('responsible_name', order.responsible_name)
+
+    if not order.table_number or not order.responsible_name:
+        return Response({"detail": "Table number and responsible name are required fields."}, status=status.HTTP_400_BAD_REQUEST)
+
+    order.save()
+
+    products = request.data.get('products', [])
+    quantities = request.data.get('quantities', [])
+
+    updated_items = {
+        int(pid): int(qty)
+        for pid, qty in zip(products, quantities)
+        if pid.strip() and qty.strip()
+    }
+
+    existing_items = {
+        item.product.id: item
+        for item in order.items.all()
+    }
+
+    for product_id in list(existing_items.keys()):
+        if product_id not in updated_items:
+            existing_items[product_id].delete()
+
+    for product_id, quantity in updated_items.items():
+        if product_id in existing_items:
+            item = existing_items[product_id]
+            if item.quantity != quantity:
+                item.quantity = quantity
+                item.save()
+        else:
+            product = get_object_or_404(Product, pk=product_id)
+            OrderItem.objects.create(order=order, product=product, quantity=quantity)
+
+    serializer = OrderSerializer(order)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_order_details(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    items = OrderItem.objects.filter(order=order).select_related('product')
+
+    order_data = {
+        'id': order.id,
+        'table_number': order.table_number,
+        'responsible_name': order.responsible_name,
+        'opened_at': localtime(order.opened_at).strftime('%d/%m/%Y %H:%M'),
+        'closed_at': localtime(order.closed_at).strftime('%d/%m/%Y %H:%M') if order.closed_at else None,
+        'is_paid': order.is_paid,
+        'items': [
+            {
+                'product_id': item.product.id,
+                'product_name': item.product.name,
+                'quantity': item.quantity,
+                'price': float(item.product.price),
+            } for item in items
+        ]
+    }
+    return Response(order_data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def api_close_order(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+
+    if not order.is_paid:
+        order.is_paid = True
+        order.save()
+
+    return Response({"success": True}, status=status.HTTP_200_OK)

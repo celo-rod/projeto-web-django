@@ -1,4 +1,6 @@
 ---
+import OrderAddDialog from "../components/OrderAddDialog.astro";
+import OrderViewDialog from "../components/OrderViewDialog.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import type { Order } from "../types/order";
 
@@ -11,6 +13,7 @@ const token = Astro.cookies.get("token")?.value;
 const response = await fetch("http://localhost:8000/api/orders/", {
   method: "GET",
   headers: {
+    "Content-Type": "application/json",
     Authorization: `Token ${token}`,
   },
 });
@@ -58,10 +61,17 @@ const orders: Order[] = await response.json();
                 )}
               </td>
               <td class="actions-cell">
-                <button class="btn-action btn-edit" title="Editar">
-                  <i class="fas fa-pencil-alt" />
-                </button>
-                <button class="btn-action btn-view" title="Ver">
+                {!order.is_paid && (
+                  <button class="btn-action btn-edit" title="Editar">
+                    <i class="fas fa-pencil-alt" />
+                  </button>
+                )}
+                <button
+                  class="btn-action btn-view"
+                  title="Ver"
+                  onclick="openViewDialog(this)"
+                  data-id={order.id}
+                >
                   <i class="fas fa-eye" />
                 </button>
               </td>
@@ -71,4 +81,49 @@ const orders: Order[] = await response.json();
       }
     </tbody>
   </table>
+
+  <OrderAddDialog />
+  <OrderViewDialog />
 </BaseLayout>
+
+<script is:inline>
+  function openAddDialog() {
+    document.getElementById("add-dialog")?.classList.add("active");
+    document.getElementById("table_number").value = "";
+    document.getElementById("responsible_name").value = "";
+    document.getElementById("order-items-container").innerHTML = "";
+    document.getElementById("order-items-container").classList.add("hidden");
+  }
+
+  function closeAddDialog() {
+    document.getElementById("add-dialog")?.classList.remove("active");
+  }
+
+  function openEditDialog(buttonEl) {
+    document.getElementById("edit-dialog")?.classList.add("active");
+  }
+
+  function closeEditDialog() {
+    document.getElementById("edit-dialog")?.classList.remove("active");
+  }
+
+  function openViewDialog(buttonEl) {
+    document.getElementById("view-dialog")?.classList.add("active");
+
+    const orderId = buttonEl.dataset.id;
+
+    document.dispatchEvent(
+      new CustomEvent("view-order", {
+        detail: { orderId },
+      })
+    );
+  }
+
+  function closeViewDialog() {
+    document.getElementById("view-dialog")?.classList.remove("active");
+  }
+</script>
+
+<script>
+  import "../scripts/order.js";
+</script>

@@ -1,0 +1,64 @@
+---
+
+---
+
+<div id="view-dialog" class="dialog-overlay">
+  <div class="dialog-content">
+    <div class="dialog-header">
+      <button
+        class="dialog-btn-back"
+        onclick="closeViewDialog()"
+        title="Fechar"
+      >
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h2 class="dialog-title">
+        Visualizar comanda
+        <i
+          id="order-status-icon"
+          class="fas fa-circle"
+          style="margin-left: 0.5rem;"></i>
+      </h2>
+    </div>
+
+    <div class="fields-container">
+      <div class="fields">
+        <span class="field-label">Mesa</span>
+        <p id="view-table-number" class="text-field"></p>
+      </div>
+      <div class="fields">
+        <span class="field-label">Responsável</span>
+        <p id="view-responsible-name" class="text-field"></p>
+      </div>
+    </div>
+
+    <div class="fields-container">
+      <div class="fields">
+        <span class="field-label">Aberta em</span>
+        <p id="view-opened-at" class="text-field"></p>
+      </div>
+      <div class="fields">
+        <span class="field-label">Fechada em</span>
+        <p id="view-closed-at" class="text-field"></p>
+      </div>
+    </div>
+
+    <div class="order-items-section">
+      <span class="field-label">Itens</span>
+      <ul id="view-order-items" class="main-list"></ul>
+    </div>
+
+    <div class="fields-container">
+      <div class="fields">
+        <span class="field-label">Total</span>
+        <p id="view-total-price" class="text-field"></p>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button id="btn-close-order" class="btn btn-confirm"
+        >Fechar comanda</button
+      >
+    </div>
+  </div>
+</div>
