@@ -1,0 +1,19 @@
+---
+const { title } = Astro.props;
+---
+
+<div id="add-dialog" class="dialog-overlay">
+  <div class="dialog-content">
+    <div class="dialog-header">
+      <button
+        class="dialog-btn-back"
+        title="Voltar"
+        onclick="closeAddDialog()"
+      >
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h2 id="dialog-title" class="dialog-title">{title}</h2>
+    </div>
+    <slot />
+  </div>
+</div>

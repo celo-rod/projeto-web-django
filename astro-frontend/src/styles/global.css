@@ -206,7 +206,7 @@ body {
   color: #f44336;
 }
 
-.modal-overlay {
+.dialog-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -222,25 +222,25 @@ body {
   transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
 }
 
-.modal-overlay.active {
+.dialog-overlay.active {
   opacity: 1;
   visibility: visible;
 }
 
-.modal-content {
+.dialog-content {
   width: clamp(300px, 30vw, 800px);
   padding: 2rem;
   background-color: white;
   border-radius: 8px;
 }
 
-.modal-header {
+.dialog-header {
   display: flex;
   align-items: center;
   margin-bottom: 1.5rem;
 }
 
-.modal-btn-back {
+.dialog-btn-back {
   margin-right: 1rem;
   background: none;
   border: none;
@@ -250,13 +250,13 @@ body {
   text-decoration: none;
 }
 
-.modal-title {
+.dialog-title {
   color: #2e7d32;
   font-size: 24px;
   font-weight: bold;
 }
 
-.modal-actions {
+.dialog-actions {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;

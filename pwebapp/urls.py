@@ -23,5 +23,8 @@ urlpatterns = [
     path('api/user/', views.api_current_user, name='api_current_user'),
     path('api/employees/', views.api_employees, name='api_employees'),
     path('api/products/', views.api_products, name='api_products'),
+    path('api/products/create/', views.api_create_product, name='api_create_product'),
+    path('api/products/update/<int:pk>/', views.api_update_product, name='api_update_product'),
+    path('api/products/delete/<int:pk>/', views.api_delete_product, name='api_delete_product'),
     path('api/orders/', views.api_orders, name='api_orders'),
 ]

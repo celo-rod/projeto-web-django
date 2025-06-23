@@ -3,7 +3,8 @@ document.addEventListener("DOMContentLoaded", () => {
   logoutButton?.addEventListener("click", handleLogout);
 });
 
-async function handleLogout() {
+async function handleLogout(event) {
+  event.preventDefault();
   const token = document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
 
   const response = await fetch("http://localhost:8000/api/logout/", {

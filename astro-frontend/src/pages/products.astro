@@ -1,8 +1,11 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import ProductAddDialog from "../components/ProductAddDialog.astro";
+import ProductDeleteDialog from "../components/ProductDeleteDialog.astro";
 import type { Product } from "../types/product";
+import ProductEditDialog from "../components/ProductEditDialog.astro";
 
-const pageTitle = "Produtos"; 
+const pageTitle = "Produtos";
 
 const token = Astro.cookies.get("token")?.value;
 
@@ -16,7 +19,11 @@ const response = await fetch("http://localhost:8000/api/products/", {
 const products: Product[] = await response.json();
 ---
 
-<BaseLayout pageTitle={pageTitle} shouldDisplayActionBtn={true} actionText="Adicionar">
+<BaseLayout
+  pageTitle={pageTitle}
+  shouldDisplayActionBtn={true}
+  actionText="Adicionar"
+>
   <table>
     <thead>
       <tr>
@@ -27,31 +34,99 @@ const products: Product[] = await response.json();
       </tr>
     </thead>
     <tbody>
-      {products.length === 0 ? (
-        <tr><td colspan="4">Nenhum produto encontrado.</td></tr>
-      ) : (
-        products.map(product => (
+      {
+        products.length === 0 ? (
           <tr>
-            <td>{product.name}</td>
-            <td>{product.description || "-"}</td>
-            <td>{product.price}</td>
-            <td class="actions-cell">
-              <button
-                class="btn-action btn-edit"
-                title="Editar"
-              >
-                <i class="fas fa-pencil-alt"></i>
-              </button>
-              <button
-                class="btn-action btn-delete"
-                title="Remover"
-              >
-                <i class="fas fa-trash-alt"></i>
-              </button>
-            </td>
-          </tr> 
-        ))
-      )}
+            <td colspan="4">Nenhum produto encontrado.</td>
+          </tr>
+        ) : (
+          products.map((product) => (
+            <tr>
+              <td>{product.name}</td>
+              <td>{product.description || "-"}</td>
+              <td>{product.price}</td>
+              <td class="actions-cell">
+                <button
+                  class="btn-action btn-edit"
+                  title="Editar"
+                  onclick="openEditDialog(this)"
+                  data-id={product.id}
+                  data-name={product.name}
+                  data-price={product.price}
+                  data-description={product.description || ""}
+                >
+                  <i class="fas fa-pencil-alt" />
+                </button>
+                <button
+                  class="btn-action btn-delete"
+                  title="Remover"
+                  onclick="openDeleteDialog(this)"
+                  data-id={product.id}
+                >
+                  <i class="fas fa-trash-alt" />
+                </button>
+              </td>
+            </tr>
+          ))
+        )
+      }
     </tbody>
   </table>
+
+  <ProductAddDialog />
+  <ProductEditDialog />
+  <ProductDeleteDialog />
 </BaseLayout>
+
+<script is:inline>
+  function openAddDialog() {
+    document.getElementById("add-dialog")?.classList.add("active");
+    document.getElementById("name").value = "";
+    document.getElementById("price").value = "";
+    document.getElementById("description").value = "";
+  }
+
+  function closeAddDialog() {
+    document.getElementById("add-dialog")?.classList.remove("active");
+  }
+
+  function openEditDialog(buttonEl) {
+    document.getElementById("edit-dialog")?.classList.add("active");
+
+    const productId = buttonEl.dataset.id;
+    const productName = buttonEl.dataset.name;
+    const productPrice = buttonEl.dataset.price;
+    const productDescription = buttonEl.dataset.description;
+
+    const form = document.getElementById("edit-form");
+    if (form) {
+      document.getElementById("edit-name").value = productName;
+      document.getElementById("edit-price").value = productPrice;
+      document.getElementById("edit-description").value = productDescription;
+      form.dataset.productId = productId;
+    }
+  }
+
+  function closeEditDialog() {
+    document.getElementById("edit-dialog")?.classList.remove("active");
+  }
+
+  function openDeleteDialog(buttonEl) {
+    document.getElementById("delete-dialog")?.classList.add("active");
+
+    const productId = buttonEl.dataset.id;
+    const form = document.getElementById("delete-form");
+
+    if (form) {
+      form.dataset.productId = productId;
+    }
+  }
+
+  function closeDeleteDialog() {
+    document.getElementById("delete-dialog")?.classList.remove("active");
+  }
+</script>
+
+<script>
+  import "../scripts/product.js";
+</script>

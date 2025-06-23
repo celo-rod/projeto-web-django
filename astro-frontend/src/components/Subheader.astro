@@ -8,7 +8,7 @@ const { pageTitle, query, shouldDisplayActionBtn, actionText } = Astro.props;
     {shouldDisplayActionBtn && (
       <button
         class="btn btn-add"
-        onclick="openAddOrEditModal('add')"
+        onclick="openAddDialog()"
       >
         <i class="fas fa-plus"></i> {actionText}
       </button>

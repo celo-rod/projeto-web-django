@@ -280,6 +280,60 @@ def api_products(request):
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def api_create_product(request):
+    name = request.data.get('name')
+    description = request.data.get('description', '')
+    price = request.data.get('price')
+
+    if not name or not price:
+        return Response({"error": "Name and price are required fields."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        product = Product.objects.create(
+            name=name,
+            description=description,
+            price=price
+        )
+        serializer = ProductSerializer(product)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def api_update_product(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    name = request.data.get('name', product.name)
+    description = request.data.get('description', product.description)
+    price = request.data.get('price', product.price)
+
+    if not name or not price:
+        return Response({"error": "Name and price are required fields."}, status=status.HTTP_400_BAD_REQUEST)
+
+    product.name = name
+    product.description = description
+    product.price = price
+
+    try:
+        product.save()
+        serializer = ProductSerializer(product)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def api_delete_product(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+
+    try:
+        product.delete()
+        return Response({"success": True}, status=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def api_orders(request):

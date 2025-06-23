@@ -1,0 +1,52 @@
+---
+import AddDialogLayout from "../layouts/AddDialogLayout.astro";
+---
+
+<AddDialogLayout title="Adicionar produto">
+  <form id="add-form" novalidate>
+    <div class="fields-container">
+      <div class="field">
+        <label for="name" class="field-label">Nome</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          class="text-field"
+          placeholder="Nome do produto"
+          required
+        />
+        <span id="name-error" class="error hidden">O nome é obrigatório</span>
+      </div>
+      <div class="field">
+        <label for="price" class="field-label">Valor</label>
+        <input
+          type="number"
+          id="price"
+          name="price"
+          step="0.01"
+          class="number-field"
+          placeholder="0,00"
+          required
+        />
+        <span id="price-error" class="error hidden"
+          >O preço deve ser um número válido</span
+        >
+      </div>
+    </div>
+    <div class="field">
+      <label for="description" class="field-label">Descrição</label>
+      <input
+        type="text"
+        id="description"
+        name="description"
+        class="text-field"
+        placeholder="Descrição do produto"
+      />
+    </div>
+    <div class="form-actions">
+      <button id="submit-button" type="submit" class="btn btn-add"
+        >Adicionar</button
+      >
+    </div>
+  </form>
+</AddDialogLayout>
